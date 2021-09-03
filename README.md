@@ -37,6 +37,7 @@ Guest only search the movie, documentaries and shows.
 API: below api can be proccess postmain, curl, rest client.
 
 API to search for a movie with name. 
+
 	POST : http://localhost:8080/search
 	post data: 
 	{
@@ -44,6 +45,7 @@ API to search for a movie with name.
 	}
 
 API where a user can see movies that he has rated and his comments. 
+
 	POST : http://localhost:8080/searchuseritems
 	post data:
 	{
@@ -51,6 +53,7 @@ API where a user can see movies that he has rated and his comments.
 	}	
 
 API to rate a movie.
+
 	POST : http://localhost:8080/rating
 
 	{
@@ -60,6 +63,7 @@ API to rate a movie.
 	}
 
 API to add comment on movie.
+
 	POST : http://localhost:8080/comment
 	{
 		"UserId":"test3",		//user id	
