@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+
+	<head>
+		<style>
+			.dropbtn {
+			  #background-color: #04AA6D;
+			  #color: white;
+			  padding: 16px;
+			  font-size: 16px;
+			  border: none;
+			}			
+			.dropdown {
+			  float: right;
+			  #position: relative;
+			  display: inline-block;
+			}			
+			.dropdown-content {
+			  display: none;
+			  #position: absolute;
+			  background-color: #f1f1f1;
+			  min-width: 100px;
+			  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			  z-index: 1;
+			}			
+			.dropdown-content a {
+			  color: black;
+			  padding: 12px 16px;
+			  text-decoration: none;
+			  display: block;
+			}
+			#.dropdown-content a:hover {background-color: #ddd;}
+			.dropdown:hover .dropdown-content {display: block;}
+			#.dropdown:hover .dropbtn {background-color: #3e8e41;}
+			.FixedDivHeight
+			{
+			  float:right;
+			  height: 550px;
+			  width:100%; 
+			  padding:3px;
+			}
+			.Content
+			{
+			  height:550px;
+			  overflow:auto;
+			  background:#fff;
+			}
+		</style>
+		<title>SugarBox</title>
+	
+
+	<script>
+		function add(){
+			var x = document.getElementById("addMovie");
+  			if (x.style.display == "none") {
+				x.style.display = "block";
+			} 
+			/*else {
+				x.style.display = "none";
+			}*/
+			document.getElementById("searchedMovie").style.display="none";				
+		}
+		function login(){
+			var x = document.getElementById("loginDiv");
+  			if (x.style.display == "none") {
+				x.style.display = "block";
+			} 
+			x = document.getElementById("tabDiv");
+			if (x!=null && x.style.display == "none") {
+				x.style.display = "block";
+			} 
+			
+			document.getElementById("searchedMovie").style.display="none";	
+		}
+		function logout(){
+			document.getElementById("logoutFrm").submit();
+			document.getElementById("searchedMovie").style.display="none";	
+		}
+		
+		function submitsearchFrm(){
+			document.getElementById("searchedMovie").style.display="block";	
+		}
+		function submitaddFrm(){
+			document.getElementById("addMovie").style.display="block";
+		}
+
+		function loadFunction(){
+			//alert("aaa");
+			document.getElementById("addMovie").style.display="none";
+			document.getElementById("loginDiv").style.display="none";
+			//document.getElementById("searchedMovie").style.display="none";	
+			
+		}
+	</script>
+	</head>
+
+
+<body onload="loadFunction()">
+	<div id="findMovie" align="center" style="overflow: hidden;">
+		
+	<form id="searchFrm" action="/search" method="post" onsubmit="submitsearchFrm()">	
+		Search your title :
+		<input type="text" name="FindItem">
+		<input type="submit" value="Submit">
+	</form>	
+		<div class="dropdown">
+			{{if .sessUser}}
+				<!--button class="dropbtn">Dropdown</button-->
+			<div id="tabDiv">
+				<a class="dropbtn">{{.sessUser}}</a>
+				<div class="dropdown-content">
+					{{if eq .sessUser "Admin"}}<a href="#" onclick="add();">Add Movie</a>{{end}}
+					<form id="logoutFrm" action="/logout" method="post">
+						<a href="#" onclick="logout();">Logout</a>
+					</form>
+				</div>
+			</div>
+			{{else}}
+				<div id="loginID"><a href="#" onclick="login();">Login</a></div>
+			{{end}}
+		</div>
+	</div>
+    	
+	<hr>
+	<div class="FixedDivHeight" align="center">
+		<div id="addMovie" class="Content">
+		<form action="/add" method="post" onsubmit="submitaddFrm()">
+			<h2>Add Movie/Documentary/Show</h2><br/>
+			Select Type: <select name="type" id="type">
+				<option value="movie" selected>Movie</option>
+				<option value="documentary">Documentary</option>
+				<option value="show">Show</option>
+			</select><br/><br/>
+			Enter Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="typeName"><br/><br/>
+			Enter Director Name:&nbsp;&nbsp;<input type="text" name="directorName"><br/><br/>
+			Enter Artist Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="artist"><br/><br/>
+			<input type="submit" value="Submit"><br/><br/>		
+		</form>	
+		</div>
+		<div id="searchedMovie">
+			{{if .result}}
+				{{if .result.Name}}
+					<table border="1" cellpadding="0" cellspacing="0">
+					  <tr>
+					    <th>Name</th><th>Type</th><th>Director</th><th>Artist</th><th>Rating</th><th>{{if .sessUser}}Comments{{else}}NoOfRatedUser{{end}}</th>
+					  </tr>
+					  <tr>
+					    <td>{{.result.Name}}</td><td>{{.result.Type}}</td><td>{{.result.Director}}</td><td>{{.result.Artist}}</td>
+						<td>{{if ne 0 .result.Rating}}{{.result.Rating}}{{else}}
+							{{if and (.sessUser)  (ne .sessUser "Admin" )}}
+								<form action="/rating" method="post">
+								<input type="hidden" name="UserId" value={{.sessUser}}>
+								<input type="hidden" name="Name" value={{.result.Name}}>
+								<select name="Rating">
+								  <option value="1">1</option>
+								  <option value="2">2</option>
+								  <option value="3">3</option>
+								  <option value="4">4</option>
+								  <option value="5" selected>5</option>
+								</select>
+								<input type="submit" value="Add Rating">
+								</form>
+							{{else}}
+								0
+							{{end}}
+						{{end}}</td>
+						{{if .sessUser}}
+							<td>
+							{{if .result.Comment}}
+								{{.result.Comment}}
+							{{else}}
+								{{if and (.sessUser)  (ne .sessUser "Admin" )}}
+								<form action="/comment" method="post">
+								<input type="hidden" name="UserId" value={{.sessUser}}>
+								<input type="hidden" name="Name" value={{.result.Name}}>
+								<input type="text" name="Comment">
+								<input type="submit" value="Save Comment">
+								</form>
+								{{end}}
+							{{end}}
+							</td>						
+						{{else}}
+							<td>{{if ne 0 .result.NoOfRatedUser}}{{.result.NoOfRatedUser}}{{else}}0{{end}}</td>
+						{{end}}
+	
+						
+					  </tr>					  
+					</table>
+				{{else}}
+					<h3>No item found, try again...</h3>
+				{{end}}
+				
+			
+			{{end}}
+   
+		</div>	
+		<div id="loginDiv">
+		<form action="/login" method="post">
+				<h3>Login</h3>
+			User     : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="user"><br/><br/>
+			Password :<input type="password" name="pass"><br/><br/>			
+			<input type="submit" value="Submit"><br/><br/>			
+		</form>
+		</div>	
+	</div>
+	<hr>
+	<center>Copyright@2021</center>
+</body>
+</html>
+<script>
+	//function loadFunction(){
+		//alert("asda");
+		//document.getElementById("addMovie").style.display="none";
+		//document.getElementById("searchedMovie").style.display="none";	
+		//document.getElementById("loginDiv").style.display="none";	
+		//document.getElementById("tabDiv").style.display="none";	
+	//}
+		
+</script>
